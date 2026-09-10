@@ -1,0 +1,1075 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Groundtruth — Executive Dashboard — Qadira Developments</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap');
+
+:root{
+  --ink:#161E2E;
+  --ink-2:#232D42;
+  --paper:#EEE9DC;
+  --card:#FFFFFF;
+  --line:#DFD6BE;
+  --brass:#9C7A3C;
+  --brass-lt:#C9A15E;
+  --clay:#A24A2E;
+  --clay-lt:#F2DCD3;
+  --moss:#3F6B4A;
+  --moss-lt:#DCE9DD;
+  --amber:#B4822E;
+  --amber-lt:#F4E6CC;
+  --slate:#5B6472;
+  --slate-lt:#8891A0;
+}
+*{box-sizing:border-box;}
+body{
+  margin:0;
+  background:var(--paper);
+  color:var(--ink);
+  font-family:'IBM Plex Sans',sans-serif;
+  padding:22px 18px 60px;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1260px;margin:0 auto;}
+
+/* ---------- HEADER ---------- */
+.topbar{
+  display:flex;justify-content:space-between;align-items:flex-end;
+  flex-wrap:wrap;gap:14px;
+  padding-bottom:14px;margin-bottom:14px;
+  border-bottom:2px solid var(--ink);
+}
+.brand{display:flex;align-items:baseline;gap:12px;}
+.brand .mark{font-family:'Fraunces',serif;font-weight:700;font-size:23px;color:var(--ink);}
+.brand .mark span{color:var(--brass);}
+.brand .client{font-size:13px;color:var(--slate);font-weight:500;}
+.topmeta{text-align:right;font-size:11.5px;color:var(--slate);line-height:1.5;}
+.topmeta b{color:var(--ink);}
+
+/* ---------- TABS (functional) ---------- */
+.tabstrip{display:flex;gap:2px;margin-bottom:18px;}
+.tabstrip button{
+  font:inherit;font-size:12.5px;font-weight:600;padding:9px 16px;
+  color:var(--slate-lt);background:#E4DDC9;border-radius:6px 6px 0 0;
+  border:none;cursor:pointer;transition:background .15s ease, color .15s ease;
+}
+.tabstrip button:hover{color:var(--ink);}
+.tabstrip button.on{background:var(--card);color:var(--ink);box-shadow:0 -2px 0 var(--brass) inset;cursor:default;}
+.tabstrip button:focus-visible{outline:2px solid var(--brass);outline-offset:2px;}
+
+/* ---------- FILTERS (functional) ---------- */
+.filters{
+  display:flex;gap:10px;align-items:center;flex-wrap:wrap;
+  margin-bottom:18px;
+}
+.filters .chip{
+  font:inherit;font-size:12px;font-weight:600;color:var(--ink);
+  background:var(--card);border:1px solid var(--line);border-radius:20px;
+  padding:6px 14px;display:flex;align-items:center;gap:6px;cursor:pointer;
+}
+.filters .chip:hover{border-color:var(--brass);}
+.filters .chip:focus-visible{outline:2px solid var(--brass);outline-offset:2px;}
+.filters .chip small{color:var(--slate);font-weight:500;}
+.filters .chip.active{background:var(--ink);color:#fff;border-color:var(--ink);}
+.filters .chip.active small{color:#C9CFDA;}
+.filters .chip .arrow{font-size:9px;opacity:.6;margin-left:2px;}
+.filters .resetlink{
+  font-size:11.5px;color:var(--slate);font-weight:600;background:none;border:none;
+  cursor:pointer;text-decoration:underline;text-underline-offset:2px;padding:6px 4px;
+  display:none;
+}
+.filters .resetlink.show{display:inline-block;}
+
+/* ---------- TAB PANELS ---------- */
+.panel{display:none;}
+.panel.on{display:block;animation:fadein .18s ease;}
+@keyframes fadein{from{opacity:0;transform:translateY(2px);}to{opacity:1;transform:none;}}
+
+/* ---------- LAYOUT ---------- */
+.grid{display:flex;gap:16px;flex-wrap:wrap;}
+.kpi-row{margin-bottom:16px;}
+.kpi-row .card{flex:1 1 250px;}
+.row-2{margin-bottom:16px;}
+.row-2 .card:first-child{flex:1.6 1 480px;}
+.row-2 .card:last-child{flex:1 1 300px;}
+.row-2b{margin-bottom:16px;}
+.row-2b .card{flex:1 1 380px;}
+.stat-row{margin-bottom:16px;}
+.stat-row .card{flex:1 1 260px;}
+
+.card{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:10px;
+  box-shadow:0 1px 2px rgba(22,30,46,0.06);
+  overflow:hidden;
+}
+.card-pad{padding:18px 20px;}
+.card-head{
+  display:flex;justify-content:space-between;align-items:flex-start;
+  padding:16px 20px 4px;
+}
+.card-head h3{font-family:'Fraunces',serif;font-size:16.5px;font-weight:600;margin:0;color:var(--ink);}
+.card-head .sub{font-size:11.5px;color:var(--slate);margin-top:3px;}
+.badge{font-size:10px;font-weight:700;letter-spacing:.04em;padding:3px 8px;border-radius:4px;text-transform:uppercase;white-space:nowrap;}
+.badge.navy{background:var(--ink);color:#fff;}
+.badge.clay{background:var(--clay-lt);color:var(--clay);}
+.badge.moss{background:var(--moss-lt);color:var(--moss);}
+.badge.amber{background:var(--amber-lt);color:var(--amber);}
+
+/* ---------- KPI CARDS ---------- */
+.kpi{padding:17px 20px 16px;position:relative;}
+.kpi .accent{position:absolute;top:0;left:0;right:0;height:3px;}
+.kpi.c-navy .accent{background:var(--ink);}
+.kpi.c-clay .accent{background:var(--clay);}
+.kpi.c-brass .accent{background:var(--brass);}
+.kpi.c-moss .accent{background:var(--moss);}
+.kpi .label{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--slate);font-weight:600;margin-bottom:8px;}
+.kpi .value{font-family:'Fraunces',serif;font-size:27px;font-weight:600;color:var(--ink);line-height:1;}
+.kpi .value small{font-family:'IBM Plex Sans';font-size:13px;font-weight:500;color:var(--slate);}
+.kpi .delta{display:flex;align-items:center;gap:5px;margin-top:9px;font-size:12px;font-weight:600;}
+.kpi .delta.down{color:var(--clay);}
+.kpi .delta.up{color:var(--moss);}
+.kpi .delta.flat{color:var(--slate);}
+.kpi .delta .ctx{color:var(--slate);font-weight:500;}
+
+/* ---------- NARRATIVE STRIP ---------- */
+.narrative{
+  background:var(--ink);color:#EDE9DC;border-radius:10px;
+  padding:18px 22px;margin-bottom:16px;font-size:13.5px;line-height:1.6;
+}
+.narrative b{color:#fff;}
+.narrative .kicker{font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--brass-lt);font-weight:700;margin-bottom:7px;}
+
+/* ---------- STAT CARDS (brokers/inventory) ---------- */
+.stat{padding:17px 20px 16px;}
+.stat .label{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--slate);font-weight:600;margin-bottom:8px;}
+.stat .value{font-family:'Fraunces',serif;font-size:23px;font-weight:600;color:var(--ink);}
+.stat .foot{font-size:12px;color:var(--slate);margin-top:7px;line-height:1.5;}
+
+/* ---------- BAR CHART (forecast vs reality) ---------- */
+.barchart{padding:6px 20px 20px;}
+.legend{display:flex;gap:18px;margin-bottom:14px;font-size:12px;color:var(--slate);font-weight:500;}
+.legend span{display:inline-flex;align-items:center;gap:6px;}
+.legend i{width:10px;height:10px;border-radius:2px;display:inline-block;}
+.legend .dim{opacity:.35;text-decoration:line-through;}
+.bars{display:flex;align-items:flex-end;gap:26px;height:190px;padding:0 6px;border-bottom:1px solid var(--line);}
+.bargroup{flex:1;display:flex;align-items:flex-end;justify-content:center;gap:6px;height:100%;position:relative;transition:opacity .15s ease;}
+.bargroup.dim{opacity:.3;}
+.bargroup.hi .bar{box-shadow:0 0 0 2px var(--brass);}
+.bar{width:26px;border-radius:3px 3px 0 0;position:relative;transition:height .25s ease;}
+.bar.forecast{background:var(--ink);}
+.bar.reality{background:var(--clay);}
+.bar.hidden{visibility:hidden;}
+.bar .tip{
+  position:absolute;top:-18px;left:50%;transform:translateX(-50%);
+  font-family:'IBM Plex Mono';font-size:10px;color:var(--slate);white-space:nowrap;
+}
+.barlabels{display:flex;gap:26px;padding:8px 6px 0;}
+.barlabels div{flex:1;text-align:center;font-size:11px;color:var(--slate);font-weight:500;transition:opacity .15s ease;}
+.barlabels div.dim{opacity:.35;}
+
+/* ---------- GAUGE ---------- */
+.gaugewrap{display:flex;flex-direction:column;align-items:center;padding:8px 20px 22px;}
+.gaugesvg{position:relative;width:168px;height:168px;}
+.gaugesvg .center{position:absolute;top:0;left:0;right:0;bottom:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.gaugesvg .center .pct{font-family:'Fraunces',serif;font-size:26px;font-weight:700;color:var(--clay);line-height:1;}
+.gaugesvg .center .lbl{font-size:10px;color:var(--slate);text-transform:uppercase;letter-spacing:.04em;margin-top:5px;text-align:center;max-width:110px;}
+.gaugefoot{font-size:12px;color:var(--slate);text-align:center;margin-top:14px;line-height:1.5;}
+.gaugefoot b{color:var(--ink);}
+
+/* ---------- CALLOUT ---------- */
+.callout{
+  border:1px dashed var(--brass);background:#FBF7EE;border-radius:8px;
+  padding:14px 18px;margin:0 20px 18px;font-size:12.5px;line-height:1.55;color:var(--ink-2);
+}
+.callout b{color:var(--ink);}
+.callout .kicker{font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--brass);font-weight:700;margin-bottom:5px;}
+
+/* ---------- RISK TABLE ---------- */
+table.risktbl{width:100%;border-collapse:collapse;font-size:12.5px;}
+table.risktbl th{
+  text-align:left;font-size:10.5px;text-transform:uppercase;letter-spacing:.04em;
+  color:var(--slate);font-weight:600;padding:8px 20px;border-bottom:1px solid var(--ink);
+}
+table.risktbl td{padding:11px 20px;border-bottom:1px solid var(--line);vertical-align:middle;}
+table.risktbl tr:last-child td{border-bottom:none;}
+table.risktbl tr.rowdim{opacity:.35;}
+.sev{display:inline-block;font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;letter-spacing:.02em;}
+.sev.risk{background:var(--clay-lt);color:var(--clay);}
+.sev.watch{background:var(--amber-lt);color:var(--amber);}
+.sev.ok{background:var(--moss-lt);color:var(--moss);}
+.mono{font-family:'IBM Plex Mono';}
+.btnlink{
+  font:inherit;font-size:11px;font-weight:600;color:var(--ink);background:#fff;border:1px solid var(--line);
+  border-radius:5px;padding:5px 10px;white-space:nowrap;cursor:pointer;
+}
+.btnlink:hover{border-color:var(--brass);}
+.btnlink:disabled{opacity:.5;cursor:default;}
+.btnlink.done{background:var(--moss-lt);color:var(--moss);border-color:var(--moss-lt);}
+.emptyrow{padding:22px 20px;text-align:center;color:var(--slate);font-size:12.5px;}
+
+/* ---------- BROKER TABLE ---------- */
+table.brokertbl{width:100%;border-collapse:collapse;font-size:12.5px;}
+table.brokertbl th{
+  text-align:left;font-size:10.5px;text-transform:uppercase;letter-spacing:.04em;
+  color:var(--slate);font-weight:600;padding:8px 20px;border-bottom:1px solid var(--ink);
+}
+table.brokertbl td{padding:10px 20px;border-bottom:1px solid var(--line);vertical-align:middle;}
+table.brokertbl tr:last-child td{border-bottom:none;}
+.liftcell{display:flex;align-items:center;gap:10px;}
+.liftbar{width:110px;background:#EDE6D2;border-radius:5px;height:14px;position:relative;overflow:hidden;flex-shrink:0;}
+.lifffill{height:100%;border-radius:5px;}
+.lifffill.hi{background:var(--moss);}
+.lifffill.mid{background:var(--brass);}
+.lifffill.lo{background:var(--clay);}
+.liftpct{font-family:'IBM Plex Mono';font-size:11.5px;color:var(--slate);width:36px;flex-shrink:0;}
+.tierlbl{font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px;letter-spacing:.02em;}
+.tierlbl.hi{background:var(--moss-lt);color:var(--moss);}
+.tierlbl.mid{background:var(--amber-lt);color:var(--amber);}
+.tierlbl.lo{background:var(--clay-lt);color:var(--clay);}
+
+/* ---------- HEATMAP ---------- */
+.heatwrap{padding:8px 20px 20px;}
+table.heattbl{width:100%;border-collapse:separate;border-spacing:4px;}
+table.heattbl th{font-size:10.5px;color:var(--slate);font-weight:600;padding-bottom:4px;}
+table.heattbl th.rowhead{width:78px;}
+table.heattbl td.rowlabel{font-size:11.5px;color:var(--slate);font-weight:500;white-space:nowrap;padding-right:8px;}
+.hcell{height:38px;text-align:center;vertical-align:middle;font-family:'IBM Plex Mono';font-size:11px;color:#fff;border-radius:4px;}
+.h0{background:#DDD3B8;color:var(--ink);}
+.h1{background:var(--brass-lt);}
+.h2{background:var(--clay);}
+.h3{background:#7A2E1B;}
+.heatnote{font-size:12px;color:var(--slate);margin-top:12px;line-height:1.55;}
+.heatnote b{color:var(--ink);}
+.heatlegend{display:flex;gap:14px;margin-top:12px;font-size:10.5px;color:var(--slate);flex-wrap:wrap;}
+.heatlegend span{display:flex;align-items:center;gap:5px;}
+.heatlegend i{width:10px;height:10px;border-radius:2px;display:inline-block;}
+
+/* ---------- ACTIONS PANEL ---------- */
+.actions-head{
+  background:var(--ink);color:#fff;padding:14px 20px;
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;
+}
+.actions-head h3{font-family:'Fraunces',serif;font-size:16.5px;margin:0;font-weight:600;}
+.actions-head .sub{font-size:11.5px;color:#B9C0CE;margin-top:2px;}
+.arow{
+  display:flex;align-items:center;gap:16px;padding:15px 20px;border-bottom:1px solid var(--line);
+  transition:opacity .15s ease;
+}
+.arow:last-child{border-bottom:none;}
+.arow.done{opacity:.5;}
+
+/* ---------- PRICING TABLE ---------- */
+.pricetbl{width:100%;border-collapse:collapse;font-size:12.5px;margin:0;}
+.pricetbl th{text-align:left;font-size:10.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--slate);font-weight:600;padding:8px 20px;border-bottom:1px solid var(--ink);}
+.pricetbl td{padding:12px 20px 18px;border-bottom:1px solid var(--line);vertical-align:top;width:50%;}
+.pricetbl tr:last-child td{border-bottom:none;}
+.inclist{list-style:none;margin:0;padding:0;font-size:12.5px;line-height:1.65;color:var(--ink-2);}
+.inclist li{padding:3px 0 3px 20px;position:relative;}
+.inclist li.yes:before{content:'+';position:absolute;left:0;color:var(--moss);font-weight:700;}
+.inclist li.no:before{content:'\2013';position:absolute;left:0;color:var(--clay);font-weight:700;}
+
+/* ---------- FAQ ACCORDION ---------- */
+.faqlist{padding:2px 20px 16px;}
+.faq-item{border-bottom:1px solid var(--line);}
+.faq-item:last-child{border-bottom:none;}
+.faq-q{
+  width:100%;text-align:left;font:inherit;font-size:13px;font-weight:600;color:var(--ink);
+  background:none;border:none;cursor:pointer;padding:14px 0;display:flex;justify-content:space-between;align-items:center;gap:12px;
+}
+.faq-q:hover{color:var(--brass);}
+.faq-q:focus-visible{outline:2px solid var(--brass);outline-offset:2px;}
+.faq-q .chev{font-size:11px;color:var(--slate);transition:transform .15s ease;flex-shrink:0;}
+.faq-item.open .faq-q .chev{transform:rotate(90deg);}
+.faq-a{max-height:0;overflow:hidden;transition:max-height .2s ease;font-size:12.5px;color:var(--slate);line-height:1.6;}
+.faq-item.open .faq-a{max-height:240px;padding-bottom:14px;}
+.faq-a b{color:var(--ink);}
+.faq-a .ref{color:var(--slate-lt);font-size:11px;}
+.prio{
+  width:64px;flex-shrink:0;text-align:center;font-size:10px;font-weight:700;
+  padding:5px 0;border-radius:5px;letter-spacing:.03em;
+}
+.prio.high{background:var(--clay);color:#fff;}
+.prio.med{background:var(--amber);color:#fff;}
+.aimpact{width:108px;flex-shrink:0;}
+.aimpact .v{font-family:'IBM Plex Mono';font-weight:600;font-size:14px;color:var(--ink);}
+.aimpact .l{font-size:10px;color:var(--slate);text-transform:uppercase;letter-spacing:.03em;}
+.abody{flex:1;min-width:200px;}
+.abody .t{font-size:13.5px;font-weight:600;color:var(--ink);margin-bottom:2px;}
+.abody .d{font-size:12px;color:var(--slate);}
+.acta{
+  flex-shrink:0;font:inherit;font-size:11.5px;font-weight:600;color:#fff;background:var(--ink);
+  border:none;border-radius:6px;padding:8px 14px;white-space:nowrap;cursor:pointer;
+}
+.acta:hover{background:var(--ink-2);}
+.acta.done{background:var(--moss);cursor:default;}
+
+footer.note{
+  margin-top:6px;padding:14px 4px 4px;font-size:11.5px;color:var(--slate);text-align:center;
+}
+
+@media (max-width:640px){
+  .liftbar{width:70px;}
+  .aimpact{width:88px;}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <div class="brand">
+      <div class="mark">Ground<span>truth</span></div>
+      <div class="client">Executive Dashboard · Qadira Developments</div>
+    </div>
+    <div class="topmeta">
+      Prepared for CFO &amp; board review · Week of <b>8 September 2026</b><br>
+      Source: Salesforce (read-only) · Last refreshed <b>Mon 08:00</b>
+    </div>
+  </div>
+
+  <div class="tabstrip" role="tablist">
+    <button class="on" data-tab="overview" role="tab" aria-selected="true">Overview</button>
+    <button data-tab="pipeline" role="tab" aria-selected="false">Pipeline</button>
+    <button data-tab="brokers" role="tab" aria-selected="false">Brokers</button>
+    <button data-tab="inventory" role="tab" aria-selected="false">Inventory</button>
+    <button data-tab="pricing" role="tab" aria-selected="false">Pricing &amp; FAQ</button>
+  </div>
+
+  <div class="filters">
+    <button class="chip active" id="chip-project">All Projects <small>(4)</small></button>
+    <button class="chip" id="chip-quarter">Quarter <small>Q3 2026 · Live</small></button>
+    <button class="chip active" id="chip-compare">Compare to <small>Board Forecast</small></button>
+    <button class="resetlink" id="chip-reset">Reset filters</button>
+  </div>
+
+  <!-- =================== OVERVIEW =================== -->
+  <div class="panel on" id="panel-overview">
+
+    <div class="grid kpi-row">
+      <div class="card kpi c-clay">
+        <div class="accent"></div>
+        <div class="label" id="kpi1-label">Q3 Pipeline Reality</div>
+        <div class="value" id="kpi1-value">AED 43.9M <small>/ 61.4M forecast</small></div>
+        <div class="delta down" id="kpi1-delta">&#9660; 28.5% <span class="ctx">vs board-reported forecast</span></div>
+      </div>
+      <div class="card kpi c-amber">
+        <div class="accent"></div>
+        <div class="label">Annual Cost Exposure Identified</div>
+        <div class="value">~AED 5.0M</div>
+        <div class="delta flat">Forecast risk, broker waste &amp; stuck inventory</div>
+      </div>
+      <div class="card kpi c-navy">
+        <div class="accent"></div>
+        <div class="label">Deals Needing Action</div>
+        <div class="value" id="kpi3-value">3 <small>this week</small></div>
+        <div class="delta down" id="kpi3-delta">&#9660; 2 high, 1 watch</div>
+      </div>
+      <div class="card kpi c-moss">
+        <div class="accent"></div>
+        <div class="label">Risk-Adjusted Year-1 ROI</div>
+        <div class="value">~530% <small>payback ≈ 2 qtrs</small></div>
+        <div class="delta up">&#9650; 5.7×&ndash;6.9× return multiple</div>
+      </div>
+    </div>
+
+    <div class="narrative">
+      <div class="kicker">What this is telling you</div>
+      Q3 is tracking to <b>roughly 72% of the board-reported forecast</b>, driven almost entirely by Palm Vista and Corniche Heights — not a portfolio-wide problem. The three issues Layla named cost an estimated <b>AED 4.5&ndash;5.5M a year</b> across forecasting misses, unpriced broker spend and stuck inventory; Groundtruth's own year-one cost is about <b>AED 397,000</b>, all in, across the pilot and four live projects. Use the tabs above to see the evidence behind each number — nothing here required a single new field or a changed habit from the 22-person sales team. It reads Salesforce through the standard API, sits outside its UI, and never touches Northbay's configuration or the AI add-ons Qadira already owns. See <b>Pricing &amp; FAQ</b> for the number, and for what happens if it doesn't work out.
+    </div>
+
+    <div class="card">
+      <div class="actions-head">
+        <div><h3>Recommended Actions</h3><div class="sub">Ranked by financial impact · week of 8 September</div></div>
+        <span class="badge navy" style="background:#2A3550;" id="actions-badge">4 open</span>
+      </div>
+      <div class="arow" data-action>
+        <div class="prio high">HIGH</div>
+        <div class="aimpact"><div class="v">AED 1.85M</div><div class="l">at risk</div></div>
+        <div class="abody"><div class="t">Follow up on Unit 1204, Marbella Bay</div><div class="d">No contact logged in 24 days; last touch was a price objection.</div></div>
+        <button class="acta" data-done-label="Assign owner">Assign owner</button>
+      </div>
+      <div class="arow" data-action>
+        <div class="prio high">HIGH</div>
+        <div class="aimpact"><div class="v">AED 800K</div><div class="l">tied up</div></div>
+        <div class="abody"><div class="t">Fix Tower B, floors 7&ndash;11 listing imagery</div><div class="d">Missing harbour-facing photos, not price, is the likely driver of a 5&times; slower sell rate.</div></div>
+        <button class="acta" data-done-label="Send to marketing">Send to marketing</button>
+      </div>
+      <div class="arow" data-action>
+        <div class="prio med">MED</div>
+        <div class="aimpact"><div class="v">~AED 1.06M</div><div class="l">/ yr wasted</div></div>
+        <div class="abody"><div class="t">Review commission: Al Fanar Properties, Palmgate Advisors</div><div class="d">Consistently low net-lift &mdash; buyer profiles match the walk-in baseline.</div></div>
+        <button class="acta" data-done-label="Schedule review">Schedule review</button>
+      </div>
+      <div class="arow" data-action>
+        <div class="prio med">MED</div>
+        <div class="aimpact"><div class="v">AED 1.65M</div><div class="l">delayed</div></div>
+        <div class="abody"><div class="t">Chase overdue deposit, Unit 2201, Al Zahra</div><div class="d">Deposit due date passed 4 days ago, unflagged in CRM.</div></div>
+        <button class="acta" data-done-label="Send reminder">Send reminder</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =================== PIPELINE =================== -->
+  <div class="panel" id="panel-pipeline">
+
+    <div class="grid row-2">
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <h3 id="pl-chart-title">Forecast vs. Reality, by Project</h3>
+            <div class="sub" id="pl-chart-sub">Board-reported CRM forecast against the Groundtruth reality score, Q3 2026</div>
+          </div>
+          <span class="badge clay" id="pl-chart-badge">-28.5% overall</span>
+        </div>
+        <div class="barchart">
+          <div class="legend" id="pl-legend">
+            <span><i style="background:var(--ink)"></i><span id="pl-legend-a">Board Forecast</span></span>
+            <span><i style="background:var(--clay)"></i><span id="pl-legend-b">Groundtruth Reality</span></span>
+          </div>
+          <div class="bars" id="pl-bars"></div>
+          <div class="barlabels" id="pl-barlabels"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><div><h3 id="pl-gauge-title">Forecast Confidence</h3><div class="sub">Reality score vs. stage-field forecast</div></div></div>
+        <div class="gaugewrap">
+          <div class="gaugesvg">
+            <svg width="168" height="168" viewBox="0 0 168 168">
+              <circle cx="84" cy="84" r="70" fill="none" stroke="#EDE6D2" stroke-width="16"/>
+              <circle id="pl-gauge-arc" cx="84" cy="84" r="70" fill="none" stroke="#A24A2E" stroke-width="16"
+                stroke-linecap="round" stroke-dasharray="314.5 439.8" transform="rotate(-90 84 84)"/>
+            </svg>
+            <div class="center"><div class="pct" id="pl-gauge-pct">71.5%</div><div class="lbl" id="pl-gauge-lbl">of forecast</div></div>
+          </div>
+          <div class="gaugefoot" id="pl-gauge-foot">Groundtruth is tracking to <b>71.5%</b> of the board-reported number, &plusmn;6% confidence band. Palm Vista and Corniche Heights are driving the gap.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:16px;">
+      <div class="callout" id="pl-callout" style="margin:18px 20px;">
+        <div class="kicker">Why trust this number</div>
+        The Pipeline Reality Score is calibrated against the last three to four closed quarters of data Salesforce already logs automatically &mdash; stage-change timestamps, activity dates, no new fields. Toggle <b>Quarter</b> above to see the backtest: what the model would have called last quarter, checked against what actually closed.
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div><h3>Deal Risk Radar</h3><div class="sub">Ranked by momentum loss, this week</div></div>
+        <span class="badge clay" id="risk-badge">2 risk</span>
+      </div>
+      <table class="risktbl" id="risk-table">
+        <tr><th>Deal</th><th>Value</th><th>Flag</th><th></th></tr>
+        <tr data-project="Marbella Bay">
+          <td>Unit 1204, Marbella Bay<br><span style="color:var(--slate);font-size:11px;">No contact in 24 days</span><br><span style="color:var(--brass);font-size:11px;font-weight:600;">vs. Unit 1207 — same tower &amp; price band, contacted 2 days ago</span></td>
+          <td class="mono">AED 1.85M</td>
+          <td><span class="sev risk">Risk</span></td>
+          <td><button class="btnlink" data-done-label="Assign follow-up">Assign follow-up</button></td>
+        </tr>
+        <tr data-project="Palm Vista">
+          <td>Unit 0803, Palm Vista B<br><span style="color:var(--slate);font-size:11px;">Stalled 31d at a 9-day-avg stage</span><br><span style="color:var(--brass);font-size:11px;font-weight:600;">vs. Unit 0805 — same floor &amp; type, closed in 11 days</span></td>
+          <td class="mono">AED 1.20M</td>
+          <td><span class="sev risk">Risk</span></td>
+          <td><button class="btnlink" data-done-label="Assign follow-up">Assign follow-up</button></td>
+        </tr>
+        <tr data-project="Al Zahra">
+          <td>Unit 2201, Al Zahra<br><span style="color:var(--slate);font-size:11px;">Deposit due date passed 4 days ago</span><br><span style="color:var(--brass);font-size:11px;font-weight:600;">vs. Unit 2198 — same release, deposit received on time</span></td>
+          <td class="mono">AED 1.65M</td>
+          <td><span class="sev watch">Watch</span></td>
+          <td><button class="btnlink" data-done-label="Send reminder">Send reminder</button></td>
+        </tr>
+        <tr data-project="Corniche Hts.">
+          <td>Unit 0507, Corniche Hts.<br><span style="color:var(--slate);font-size:11px;">Above-median pace and activity</span></td>
+          <td class="mono">AED 0.98M</td>
+          <td><span class="sev ok">On track</span></td>
+          <td><button class="btnlink" disabled>No action</button></td>
+        </tr>
+      </table>
+      <div class="emptyrow" id="risk-empty" style="display:none;">No flagged deals for this project this week.</div>
+      <div class="callout" style="margin:16px 20px 18px;">
+        <div class="kicker">Why this deal, not the one next to it</div>
+        Every flag is shown against a comparable, unflagged deal in the same building and price band, so the difference is a specific, checkable fact — days since last contact, a stage that closes in 9 days elsewhere but has stalled here — not a generic risk score to accept on faith.
+      </div>
+    </div>
+  </div>
+
+  <!-- =================== BROKERS =================== -->
+  <div class="panel" id="panel-brokers">
+
+    <div class="grid stat-row">
+      <div class="card stat">
+        <div class="label">Annual Wasted Commission [EST]</div>
+        <div class="value">~AED 1.06M</div>
+        <div class="foot">≈220 broker-sourced units/yr × AED 1.2M × 2% commission, at an estimated 20% no-lift share. See Section 4.3 of the pack.</div>
+      </div>
+      <div class="card stat">
+        <div class="label">No-Lift Spend, Active Roster</div>
+        <div class="value">~19%</div>
+        <div class="foot">Share of this quarter's broker-sourced commission going to agencies whose buyers match the walk-in baseline.</div>
+      </div>
+      <div class="card stat">
+        <div class="label">Agencies Ranked</div>
+        <div class="value">61 <small style="font-family:'IBM Plex Sans';font-size:13px;color:var(--slate);">active of 90 registered</small></div>
+        <div class="foot">Sample of 10 shown below; full ranking available in Salesforce for anyone who wants to click through.</div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:16px;">
+      <div class="card-head">
+        <div><h3>Broker Net-Lift Ranking</h3><div class="sub">Incremental lift vs. direct-channel baseline, sample of 10 active agencies</div></div>
+        <span class="badge amber">~19% no-lift spend</span>
+      </div>
+      <table class="brokertbl">
+        <tr><th>Agency</th><th>Units, Q3</th><th>Net-lift</th><th>Verdict</th></tr>
+        <tr>
+          <td>Meridian Homes</td><td class="mono">14</td>
+          <td><div class="liftcell"><div class="liftbar"><div class="lifffill hi" style="width:88%"></div></div><span class="liftpct">88%</span></div></td>
+          <td><span class="tierlbl hi">High</span></td>
+        </tr>
+        <tr>
+          <td>Coastline Realty</td><td class="mono">9</td>
+          <td><div class="liftcell"><div class="liftbar"><div class="lifffill hi" style="width:81%"></div></div><span class="liftpct">81%</span></div></td>
+          <td><span class="tierlbl hi">High</span></td>
+        </tr>
+        <tr>
+          <td>Beacon Property Partners</td><td class="mono">11</td>
+          <td><div class="liftcell"><div class="liftbar"><div class="lifffill hi" style="width:74%"></div></div><span class="liftpct">74%</span></div></td>
+          <td><span class="tierlbl hi">High</span></td>
+        </tr>
+        <tr>
+          <td>Silk Route Realty</td><td class="mono">7</td>
+          <td><div class="liftcell"><div class="liftbar"><div class="lifffill hi" style="width:69%"></div></div><span class="liftpct">69%</span></div></td>
+          <td><span class="tierlbl hi">High</span></td>
+        </tr>
+        <tr>
+          <td>Vantage Homes UAE</td><td class="mono">8</td>
+          <td><div class="liftcell"><div class="liftbar"><div class="lifffill mid" style="width:52%"></div></div><span class="liftpct">52%</span></div></td>
+          <td><span class="tierlbl mid">Medium</span></td>
+        </tr>
+        <tr>
+          <td>Crestline Advisors</td><td class="mono">6</td>
+          <td><div class="liftcell"><div class="liftbar"><div class="lifffill mid" style="width:47%"></div></div><span class="liftpct">47%</span></div></td>
+          <td><span class="tierlbl mid">Medium</span></td>
+        </tr>
+        <tr>
+          <td>Oasis Prime Realty</td><td class="mono">9</td>
+          <td><div class="liftcell"><div class="liftbar"><div class="lifffill mid" style="width:33%"></div></div><span class="liftpct">33%</span></div></td>
+          <td><span class="tierlbl mid">Medium</span></td>
+        </tr>
+        <tr>
+          <td>Al Fanar Properties</td><td class="mono">11</td>
+          <td><div class="liftcell"><div class="liftbar"><div class="lifffill lo" style="width:24%"></div></div><span class="liftpct">24%</span></div></td>
+          <td><span class="tierlbl lo">Low</span></td>
+        </tr>
+        <tr>
+          <td>Palmgate Advisors</td><td class="mono">6</td>
+          <td><div class="liftcell"><div class="liftbar"><div class="lifffill lo" style="width:18%"></div></div><span class="liftpct">18%</span></div></td>
+          <td><span class="tierlbl lo">Low</span></td>
+        </tr>
+        <tr>
+          <td>Horizon Estates</td><td class="mono">5</td>
+          <td><div class="liftcell"><div class="liftbar"><div class="lifffill lo" style="width:12%"></div></div><span class="liftpct">12%</span></div></td>
+          <td><span class="tierlbl lo">Low</span></td>
+        </tr>
+      </table>
+    </div>
+
+    <div class="card">
+      <div class="card-pad">
+        <div class="callout" style="margin:0;">
+          <div class="kicker">How lift is measured</div>
+          Each broker-sourced buyer's pre-contact activity trail — did they visit a sales centre, view a listing directly, or engage a Qadira channel before the broker's first logged touch — is compared against the equivalent profile of direct-channel buyers in the same period. A broker whose buyers show no prior Qadira contact scores high lift; one whose buyers repeatedly match people already in the pipeline scores low. This is a comparison against a stated baseline, not a black-box score.
+        </div>
+        <div class="arow" style="padding:15px 0 4px;border-top:1px solid var(--line);">
+          <div class="prio med">MED</div>
+          <div class="aimpact"><div class="v">~AED 1.06M</div><div class="l">/ yr wasted</div></div>
+          <div class="abody"><div class="t">Review commission: Al Fanar Properties, Palmgate Advisors, Horizon Estates</div><div class="d">Consistently low net-lift across the quarter &mdash; candidates for the next commission-structure review.</div></div>
+          <button class="acta" data-done-label="Schedule review">Schedule review</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =================== INVENTORY =================== -->
+  <div class="panel" id="panel-inventory">
+
+    <div class="grid stat-row">
+      <div class="card stat">
+        <div class="label">Portfolio Carrying-Cost Run-Rate [EST]</div>
+        <div class="value">AED 2.5M&ndash;3.5M<small style="font-family:'IBM Plex Sans';font-size:13px;color:var(--slate);"> / yr</small></div>
+        <div class="foot">Assuming one comparable stuck pocket per active project. See Exhibit 4.4 of the pack.</div>
+      </div>
+      <div class="card stat">
+        <div class="label">Tower B, Floors 7&ndash;11, This Pocket</div>
+        <div class="value">~AED 800K</div>
+        <div class="foot">40 unsold units × 5 months × ~AED 4,000/unit/month carrying cost.</div>
+      </div>
+      <div class="card stat">
+        <div class="label">Other Active Projects</div>
+        <div class="value">0 <small style="font-family:'IBM Plex Sans';font-size:13px;color:var(--slate);">stalled pockets flagged</small></div>
+        <div class="foot">Marbella Bay, Al Zahra and Corniche Heights — see the portfolio view below for the full breakdown by project.</div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:16px;">
+      <div class="card-head">
+        <div><h3>Unit Velocity — Portfolio View</h3><div class="sub">Average days on market by project, this week</div></div>
+        <span class="badge clay">1 pocket stalled</span>
+      </div>
+      <table class="risktbl">
+        <tr><th>Project</th><th>Avg. Days on Market</th><th>Fastest-Moving</th><th>Slowest-Moving</th><th>Status</th></tr>
+        <tr>
+          <td>Marbella Bay</td>
+          <td class="mono">34d</td>
+          <td>1&ndash;2 Bed, low floors (18d)</td>
+          <td>Penthouse (61d)</td>
+          <td><span class="sev ok">On pace</span></td>
+        </tr>
+        <tr>
+          <td>Al Zahra</td>
+          <td class="mono">41d</td>
+          <td>1&ndash;2 Bed (22d)</td>
+          <td>3-Bed, river-facing (73d)</td>
+          <td><span class="sev watch">Watch</span></td>
+        </tr>
+        <tr>
+          <td>Palm Vista Towers, Tower B</td>
+          <td class="mono">96d</td>
+          <td>1&ndash;2 Bed, floors 1&ndash;2 (15d)</td>
+          <td>Floors 7&ndash;11, all types (88&ndash;168d)</td>
+          <td><span class="sev risk">Stalled</span></td>
+        </tr>
+        <tr>
+          <td>Corniche Heights</td>
+          <td class="mono">29d</td>
+          <td>Even pace across unit types</td>
+          <td>&mdash;</td>
+          <td><span class="sev ok">On pace</span></td>
+        </tr>
+      </table>
+      <div class="heatnote" style="padding:12px 20px 18px;"><b>Reading this:</b> Palm Vista Tower B is the only pocket portfolio-wide in the Stalled category this week &mdash; floors 7&ndash;11 specifically, detailed below. Al Zahra's slower 3-Bed river-facing units are within the normal range for that unit type and not yet flagged.</div>
+    </div>
+
+    <div class="card" style="margin-bottom:16px;">
+      <div class="card-head">
+        <div><h3>Unit Velocity — Palm Vista Towers, Tower B (Deep Dive)</h3><div class="sub">Days on market by floor and unit type</div></div>
+        <span class="badge clay">Floors 7&ndash;11 stalled</span>
+      </div>
+      <div class="heatwrap">
+        <table class="heattbl">
+          <tr>
+            <th class="rowhead"></th>
+            <th>1&ndash;2 Bed</th><th>2&ndash;3 Bed</th><th>3 Bed</th><th>Penthouse</th>
+          </tr>
+          <tr>
+            <td class="rowlabel">Fl. 12&ndash;14</td>
+            <td class="hcell h0">22d</td><td class="hcell h0">18d</td><td class="hcell h0">30d</td><td class="hcell h1">61d</td>
+          </tr>
+          <tr>
+            <td class="rowlabel">Fl. 7&ndash;11</td>
+            <td class="hcell h3">168d</td><td class="hcell h3">152d</td><td class="hcell h2">94d</td><td class="hcell h2">88d</td>
+          </tr>
+          <tr>
+            <td class="rowlabel">Fl. 3&ndash;6</td>
+            <td class="hcell h0">19d</td><td class="hcell h0">24d</td><td class="hcell h1">55d</td><td class="hcell h1">49d</td>
+          </tr>
+          <tr>
+            <td class="rowlabel">Fl. 1&ndash;2</td>
+            <td class="hcell h0">15d</td><td class="hcell h0">12d</td><td class="hcell h0">20d</td><td class="hcell h0">27d</td>
+          </tr>
+        </table>
+        <div class="heatlegend">
+          <span><i style="background:#DDD3B8"></i>On pace</span>
+          <span><i style="background:var(--brass-lt)"></i>Slower</span>
+          <span><i style="background:var(--clay)"></i>Stalled</span>
+          <span><i style="background:#7A2E1B"></i>Severely stalled</span>
+        </div>
+        <div class="heatnote"><b>Likely cause found:</b> floors 7&ndash;11 are the only units marketed without the harbour-facing floor-plan imagery added in the March portal refresh &mdash; a specific, fixable cause, not a pricing or hygiene issue.</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-pad">
+        <div class="arow" style="padding:0;">
+          <div class="prio high">HIGH</div>
+          <div class="aimpact"><div class="v">AED 800K</div><div class="l">tied up</div></div>
+          <div class="abody"><div class="t">Fix Tower B, floors 7&ndash;11 listing imagery</div><div class="d">Add harbour-facing floor-plan photography to the four affected unit types and re-index the portal listings.</div></div>
+          <button class="acta" data-done-label="Send to marketing">Send to marketing</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =================== PRICING & FAQ =================== -->
+  <div class="panel" id="panel-pricing">
+
+    <div class="grid stat-row">
+      <div class="card stat">
+        <div class="label">Pilot</div>
+        <div class="value">AED 85,000</div>
+        <div class="foot">One-time · 1&ndash;2 projects · 8 weeks · all four modules, eight weekly digests, one working session with Layla's team.</div>
+      </div>
+      <div class="card stat">
+        <div class="label">Today &mdash; 4 Active Projects</div>
+        <div class="value">AED 26,000<small style="font-family:'IBM Plex Sans';font-size:13px;color:var(--slate);">/mo</small></div>
+        <div class="foot">AED 6,500 per active project per month &mdash; &asymp;AED 312,000/yr.</div>
+      </div>
+      <div class="card stat">
+        <div class="label">Year Two &mdash; 8 Projects [illustrative]</div>
+        <div class="value">~AED 45,000<small style="font-family:'IBM Plex Sans';font-size:13px;color:var(--slate);">/mo</small></div>
+        <div class="foot">15% volume step-down from project 7 &mdash; &asymp;AED 540,000/yr. Headcount doesn't move the price; project count does.</div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:16px;">
+      <div class="card-head">
+        <div><h3>Pricing Methodology</h3><div class="sub">Why active projects, not Salesforce seats</div></div>
+      </div>
+      <div class="callout" style="margin:0 20px 18px;">
+        <div class="kicker">The basis, and why</div>
+        Priced on the <b>active project</b> &mdash; not the seat, not the user. Qadira already owns 22 unused Salesforce seats and a dormant AI add-on; pricing on seats would repeat the exact mistake that's souring the CFO on this vendor relationship already. Each project is its own pipeline and inventory pool with its own calibration &mdash; unit mix, price band and broker footprint differ project to project &mdash; so cost-to-serve scales with project count, which is also the variable the "four projects going to eight" question is actually asking about.
+      </div>
+      <table class="pricetbl">
+        <tr><th>Included</th><th>Not Included</th></tr>
+        <tr>
+          <td>
+            <ul class="inclist">
+              <li class="yes">All four modules, per active project</li>
+              <li class="yes">Weekly digest + exception alerts</li>
+              <li class="yes">Monthly 30-minute review call</li>
+              <li class="yes">Recalibration as data accumulates</li>
+              <li class="yes">Compatibility check after any flagged Northbay release, at no extra charge</li>
+            </ul>
+          </td>
+          <td>
+            <ul class="inclist">
+              <li class="no">Any change to Salesforce configuration (Northbay's rate card)</li>
+              <li class="no">Reading the internal operations WhatsApp group</li>
+              <li class="no">Training beyond the one included session</li>
+              <li class="no">A different asset class, e.g. villas &mdash; priced as a small calibration add-on</li>
+            </ul>
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <div class="card" style="margin-bottom:16px;">
+      <div class="card-head">
+        <div><h3>The Business Case, Restated</h3><div class="sub">Estimated on Qadira's numbers, not ours &mdash; arithmetic in the pack</div></div>
+      </div>
+      <div class="callout" style="margin:0 20px 18px;">
+        The three problems Layla named cost an estimated <b>AED 4.5M&ndash;5.5M a year</b> [EST] &mdash; a forecasting miss's financing cost, unpriced broker commission, and stuck-inventory carrying cost. Against a year-one Groundtruth cost of <b>&asymp;AED 397,000</b>, that's an unadjusted return of roughly 11&ndash;14&times;. Because cost-avoidance claims are the easiest kind of ROI to oversell &mdash; and this CFO already regrets one vendor purchase &mdash; the number to lead with is the <b>risk-adjusted</b> one: <b>~530% year-one ROI</b> even if the estimates are only half right, with payback inside the first two quarters of full deployment.
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div><h3>Anticipated Questions</h3><div class="sub">What the CFO and board are likely to ask &mdash; tap to expand</div></div>
+      </div>
+      <div class="faqlist" id="faq-list">
+        <div class="faq-item">
+          <button class="faq-q"><span>1. What does this do that a Salesforce report does not?</span><span class="chev">&#9656;</span></button>
+          <div class="faq-a">A report is pulled and reflects the stage field. Groundtruth is pushed and reflects derived behavioural signals &mdash; the whole point is that Layla doesn't want to go and look, and doesn't believe the stage field. <span class="ref">See 1.1, 1.3.</span></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q"><span>2. We already paid for the AI add-ons. Why are we paying you as well?</span><span class="chev">&#9656;</span></button>
+          <div class="faq-a">A different shape of product entirely &mdash; outboard, not inside the CRM competing for the same adoption; narrow and tied to four named problems, not a general capability nobody asked to use. <span class="ref">See 1.2.</span></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q"><span>3. When your number and the CRM number disagree, which goes in the board pack?</span><span class="chev">&#9656;</span></button>
+          <div class="faq-a">Groundtruth's &mdash; because the CRM's stage-based number is exactly the one Layla said she didn't believe &mdash; but shown alongside the CRM figure, not instead of it, so the gap is a visible trend, not a disputed replacement. <span class="ref">See Section 2, Pipeline tab.</span></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q"><span>4. What does this cost in year two, at eight projects and forty more people?</span><span class="chev">&#9656;</span></button>
+          <div class="faq-a">Roughly AED 44,000&ndash;46,000/month. Headcount doesn't move the price &mdash; project count does. <span class="ref">See 3.3.</span></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q"><span>5. What's the smallest version of this we could buy, and what would it prove?</span><span class="chev">&#9656;</span></button>
+          <div class="faq-a">The pilot itself &mdash; 1&ndash;2 projects, eight weeks &mdash; proves whether the stuck-tower flag matches what Layla already knows and whether the forecast gap is real, before any ongoing commitment. <span class="ref">See 3.2.</span></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q"><span>6. What happens when Northbay next upgrades the org and your layer breaks?</span><span class="chev">&#9656;</span></button>
+          <div class="faq-a">Compatibility checks are included and run on any flagged release, at no extra charge, because the integration reads stable API objects rather than UI customisation. <span class="ref">See 3.5.</span></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q"><span>7. Why should Northbay introduce you rather than build this themselves?</span><span class="chev">&#9656;</span></button>
+          <div class="faq-a">Northbay is an implementation and support business on a rate card; a statistical signal product is a different discipline. Referral economics (3.6) give them the upside without the build cost or the support burden. <span class="ref">See 3.6.</span></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q"><span>8. If it doesn't work, what have we lost?</span><span class="chev">&#9656;</span></button>
+          <div class="faq-a">AED 85,000 and eight weeks. No customisation, no new licences, no multi-year contract, nothing that outlives an org upgrade cycle. <span class="ref">See 5.2.</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="note">Illustrative dashboard on invented Qadira data, built to sense-check the offering. Figures replace with live Salesforce data during the pilot.</footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  // ---------- DATA ----------
+  var Q3 = {
+    key:'q3', badgeLabel:'-28.5% overall',
+    legendA:'Board Forecast', legendB:'Groundtruth Reality',
+    title:'Forecast vs. Reality, by Project',
+    sub:'Board-reported CRM forecast against the Groundtruth reality score, Q3 2026',
+    gaugeTitle:'Forecast Confidence', gaugeLbl:'of forecast',
+    totalForecast:61.4, totalReality:43.9, pct:71.5,
+    gaugeFoot:'Groundtruth is tracking to <b>71.5%</b> of the board-reported number, &plusmn;6% confidence band. Palm Vista and Corniche Heights are driving the gap.',
+    projects:[
+      {name:'Marbella Bay', forecast:22.0, reality:19.6},
+      {name:'Al Zahra',     forecast:14.2, reality:13.8},
+      {name:'Palm Vista',   forecast:17.8, reality:8.1},
+      {name:'Corniche Hts.',forecast:7.4,  reality:2.4}
+    ]
+  };
+
+  var Q2 = {
+    key:'q2', badgeLabel:'Closed at 70% of issue',
+    legendA:'CRM Forecast (issued)', legendB:'Actual Closed',
+    title:'CRM Forecast vs. Actual Close, by Project',
+    sub:'Q2 2026 (closed) — used to backtest the model before it called Q3 live',
+    gaugeTitle:'Backtest: Forecast vs. Actual', gaugeLbl:'of issued forecast',
+    totalForecast:58.0, totalReality:40.6, pct:70.0,
+    gaugeFoot:'Q2 closed at <b>70%</b> of the CRM-issued forecast &mdash; the miss Layla described as "by a third." Run retrospectively, the Groundtruth model called the same quarter at <b>AED 40.9M</b>, within 0.7% of the AED 40.6M that actually closed.',
+    projects:[
+      {name:'Marbella Bay', forecast:20.5, reality:19.8},
+      {name:'Al Zahra',     forecast:13.0, reality:12.4},
+      {name:'Palm Vista',   forecast:16.5, reality:6.1},
+      {name:'Corniche Hts.',forecast:8.0,  reality:2.3}
+    ]
+  };
+
+  var state = { project:'all', quarter:'q3', compare:true };
+  var PROJECTS = ['all','Marbella Bay','Al Zahra','Palm Vista','Corniche Hts.'];
+
+  // ---------- TABS ----------
+  var tabButtons = document.querySelectorAll('.tabstrip button');
+  var panels = document.querySelectorAll('.panel');
+  tabButtons.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      tabButtons.forEach(function(b){ b.classList.remove('on'); b.setAttribute('aria-selected','false'); });
+      btn.classList.add('on'); btn.setAttribute('aria-selected','true');
+      var target = btn.getAttribute('data-tab');
+      panels.forEach(function(p){ p.classList.toggle('on', p.id === 'panel-' + target); });
+    });
+  });
+
+  // ---------- FILTER CHIPS ----------
+  var chipProject = document.getElementById('chip-project');
+  var chipQuarter = document.getElementById('chip-quarter');
+  var chipCompare = document.getElementById('chip-compare');
+  var chipReset = document.getElementById('chip-reset');
+
+  chipProject.addEventListener('click', function(){
+    var idx = PROJECTS.indexOf(state.project);
+    state.project = PROJECTS[(idx + 1) % PROJECTS.length];
+    render();
+  });
+
+  chipQuarter.addEventListener('click', function(){
+    state.quarter = (state.quarter === 'q3') ? 'q2' : 'q3';
+    render();
+  });
+
+  chipCompare.addEventListener('click', function(){
+    state.compare = !state.compare;
+    render();
+  });
+
+  chipReset.addEventListener('click', function(){
+    state = { project:'all', quarter:'q3', compare:true };
+    render();
+  });
+
+  // ---------- ACTION BUTTONS (generic done-toggle) ----------
+  document.addEventListener('click', function(e){
+    var btn = e.target.closest('button.acta, button.btnlink');
+    if(!btn || btn.disabled) return;
+    if(btn.classList.contains('done')){
+      // allow re-toggle back to open for the demo
+      btn.classList.remove('done');
+      btn.textContent = btn.getAttribute('data-done-label') || btn.textContent;
+      var row = btn.closest('.arow'); if(row) row.classList.remove('done');
+      updateActionsBadge();
+      return;
+    }
+    btn.classList.add('done');
+    btn.textContent = '✓ Done';
+    var row2 = btn.closest('.arow'); if(row2) row2.classList.add('done');
+    updateActionsBadge();
+  });
+
+  // ---------- FAQ ACCORDION ----------
+  document.addEventListener('click', function(e){
+    var q = e.target.closest('.faq-q');
+    if(!q) return;
+    var item = q.closest('.faq-item');
+    if(item) item.classList.toggle('open');
+  });
+
+  function updateActionsBadge(){
+    var rows = document.querySelectorAll('#panel-overview .arow');
+    var openCount = 0;
+    rows.forEach(function(r){ if(!r.classList.contains('done')) openCount++; });
+    var badge = document.getElementById('actions-badge');
+    if(badge) badge.textContent = openCount + ' open';
+  }
+
+  // ---------- RENDER ----------
+  function fmt(v){ return v.toFixed(1); }
+
+  function renderChips(){
+    if(state.project === 'all'){
+      chipProject.innerHTML = 'All Projects <small>(4)</small>';
+      chipProject.classList.add('active');
+    } else {
+      chipProject.innerHTML = state.project + ' <small>only</small>';
+      chipProject.classList.remove('active');
+    }
+    var q = (state.quarter === 'q3') ? Q3 : Q2;
+    chipQuarter.innerHTML = 'Quarter <small>' + (q.key === 'q3' ? 'Q3 2026 · Live' : 'Q2 2026 · Backtest') + '</small>';
+    chipQuarter.classList.toggle('active', q.key === 'q2');
+
+    chipCompare.innerHTML = 'Compare to <small>' + (state.compare ? q.legendA : 'Reality only') + '</small>';
+    chipCompare.classList.toggle('active', state.compare);
+
+    var isDefault = state.project === 'all' && state.quarter === 'q3' && state.compare === true;
+    chipReset.classList.toggle('show', !isDefault);
+  }
+
+  function renderPipelineChart(){
+    var q = (state.quarter === 'q3') ? Q3 : Q2;
+    document.getElementById('pl-chart-title').textContent = q.title;
+    document.getElementById('pl-chart-sub').textContent = q.sub;
+    document.getElementById('pl-chart-badge').textContent = q.badgeLabel;
+    document.getElementById('pl-legend-a').textContent = q.legendA;
+    document.getElementById('pl-legend-b').textContent = q.legendB;
+    document.getElementById('pl-legend-a').parentElement.classList.toggle('dim', !state.compare);
+
+    var maxVal = 0;
+    q.projects.forEach(function(p){ maxVal = Math.max(maxVal, p.forecast, p.reality); });
+    var scale = 170 / maxVal;
+
+    var barsWrap = document.getElementById('pl-bars');
+    var labelsWrap = document.getElementById('pl-barlabels');
+    barsWrap.innerHTML = ''; labelsWrap.innerHTML = '';
+
+    q.projects.forEach(function(p){
+      var isSelected = state.project === 'all' || state.project === p.name;
+      var group = document.createElement('div');
+      group.className = 'bargroup' + (isSelected ? '' : ' dim') + (state.project === p.name ? ' hi' : '');
+
+      var fBar = document.createElement('div');
+      fBar.className = 'bar forecast' + (state.compare ? '' : ' hidden');
+      fBar.style.height = Math.round(p.forecast * scale) + 'px';
+      var fTip = document.createElement('span'); fTip.className='tip'; fTip.textContent = fmt(p.forecast);
+      fBar.appendChild(fTip);
+
+      var rBar = document.createElement('div');
+      rBar.className = 'bar reality';
+      rBar.style.height = Math.round(p.reality * scale) + 'px';
+      var rTip = document.createElement('span'); rTip.className='tip'; rTip.textContent = fmt(p.reality);
+      rBar.appendChild(rTip);
+
+      group.appendChild(fBar); group.appendChild(rBar);
+      barsWrap.appendChild(group);
+
+      var lbl = document.createElement('div');
+      lbl.textContent = p.name;
+      if(!isSelected) lbl.classList.add('dim');
+      labelsWrap.appendChild(lbl);
+    });
+  }
+
+  function renderGauge(){
+    var q = (state.quarter === 'q3') ? Q3 : Q2;
+    var pct = q.pct;
+    var foot = q.gaugeFoot;
+    var label = q.gaugeLbl;
+
+    if(state.project !== 'all'){
+      var proj = q.projects.filter(function(p){ return p.name === state.project; })[0];
+      if(proj){
+        pct = Math.round((proj.reality / proj.forecast) * 1000) / 10;
+        label = (q.key === 'q3') ? 'of forecast · ' + state.project : 'of issued forecast · ' + state.project;
+        foot = state.project + ' is tracking to <b>' + pct + '%</b> of its ' + (q.key === 'q3' ? 'board-reported forecast' : 'issued Q2 forecast') + ' (' + fmt(proj.reality) + 'M of ' + fmt(proj.forecast) + 'M).';
+      }
+    }
+
+    document.getElementById('pl-gauge-title').textContent = q.gaugeTitle;
+    document.getElementById('pl-gauge-pct').textContent = pct + '%';
+    document.getElementById('pl-gauge-lbl').textContent = label;
+    document.getElementById('pl-gauge-foot').innerHTML = foot;
+
+    var circumference = 439.8;
+    var arcLen = Math.max(0, Math.min(100, pct)) / 100 * circumference;
+    document.getElementById('pl-gauge-arc').setAttribute('stroke-dasharray', arcLen.toFixed(1) + ' ' + circumference);
+  }
+
+  function renderRiskTable(){
+    var rows = document.querySelectorAll('#risk-table tr[data-project]');
+    var visibleCount = 0, riskCount = 0;
+    rows.forEach(function(row){
+      var match = state.project === 'all' || row.getAttribute('data-project') === state.project;
+      row.classList.toggle('rowdim', !match);
+      row.style.display = match ? '' : 'none';
+      if(match){
+        visibleCount++;
+        if(row.querySelector('.sev.risk')) riskCount++;
+      }
+    });
+    document.getElementById('risk-empty').style.display = visibleCount === 0 ? 'block' : 'none';
+    document.getElementById('risk-badge').textContent = riskCount + ' risk';
+
+    // tie the Overview "Deals Needing Action" KPI to the same filtered set
+    var actionCount = 0, highCount = 0, watchCount = 0;
+    rows.forEach(function(row){
+      var match = state.project === 'all' || row.getAttribute('data-project') === state.project;
+      if(!match) return;
+      if(row.querySelector('.sev.risk')){ actionCount++; highCount++; }
+      else if(row.querySelector('.sev.watch')){ actionCount++; watchCount++; }
+    });
+    document.getElementById('kpi3-value').innerHTML = actionCount + ' <small>this week</small>';
+    document.getElementById('kpi3-delta').innerHTML = '&#9660; ' + highCount + ' high, ' + watchCount + ' watch';
+  }
+
+  function renderOverviewKpi(){
+    // Overview KPI reflects the *current live quarter* (Q3), filtered by project
+    var base = Q3;
+    if(state.project === 'all'){
+      document.getElementById('kpi1-label').textContent = 'Q3 Pipeline Reality';
+      document.getElementById('kpi1-value').innerHTML = 'AED ' + fmt(base.totalReality) + 'M <small>/ ' + fmt(base.totalForecast) + 'M forecast</small>';
+      var deltaPct = Math.round((1 - base.totalReality/base.totalForecast) * 1000)/10;
+      document.getElementById('kpi1-delta').innerHTML = '&#9660; ' + deltaPct + '% <span class="ctx">vs board-reported forecast</span>';
+    } else {
+      var proj = base.projects.filter(function(p){ return p.name === state.project; })[0];
+      document.getElementById('kpi1-label').textContent = 'Q3 Pipeline Reality · ' + state.project;
+      document.getElementById('kpi1-value').innerHTML = 'AED ' + fmt(proj.reality) + 'M <small>/ ' + fmt(proj.forecast) + 'M forecast</small>';
+      var dPct = Math.round((1 - proj.reality/proj.forecast) * 1000)/10;
+      document.getElementById('kpi1-delta').innerHTML = '&#9660; ' + dPct + '% <span class="ctx">vs board-reported forecast</span>';
+    }
+  }
+
+  function render(){
+    renderChips();
+    renderPipelineChart();
+    renderGauge();
+    renderRiskTable();
+    renderOverviewKpi();
+  }
+
+  render();
+})();
+</script>
+</body>
+</html>
