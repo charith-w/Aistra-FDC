@@ -21,6 +21,12 @@ The prototype demonstrates the Groundtruth experience using invented but interna
 
 The prototype is designed to demonstrate the product concept, intelligence logic, executive experience and business case. It is not connected to Qadira's live Salesforce environment.
 
+## 📊 Presentation
+
+**GroundTruth – Qadira CFO Dashboard**
+
+[▶ View Presentation Deck](https://www.genspark.ai/slides?project_id=4a559237-c8f0-4641-891f-c7172c9378a6&deck=groundtruth-qadira-pitch)
+
 ---
 
 # The Business Problem
